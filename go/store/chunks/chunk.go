@@ -33,6 +33,7 @@ import (
 type Chunk struct {
 	r    hash.Hash
 	data []byte
+	size int
 }
 
 var EmptyChunk = NewChunk([]byte{})
@@ -49,15 +50,19 @@ func (c Chunk) IsEmpty() bool {
 	return len(c.data) == 0
 }
 
+func (c Chunk) Size() int {
+	return c.size
+}
+
 // NewChunk creates a new Chunk backed by data. This means that the returned Chunk has ownership of this slice of memory.
 func NewChunk(data []byte) Chunk {
 	r := hash.Of(data)
-	return Chunk{r, data}
+	return Chunk{r, data, len(data)}
 }
 
 // NewChunkWithHash creates a new chunk with a known hash. The hash is not re-calculated or verified. This should obviously only be used in cases where the caller already knows the specified hash is correct.
 func NewChunkWithHash(r hash.Hash, data []byte) Chunk {
-	return Chunk{r, data}
+	return Chunk{r, data, len(data)}
 }
 
 // ChunkWriter wraps an io.WriteCloser, additionally providing the ability to grab the resulting Chunk for all data written through the interface. Calling Chunk() or Close() on an instance disallows further writing.

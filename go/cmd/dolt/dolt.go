@@ -129,9 +129,11 @@ func runMain() int {
 	dEnv := env.Load(context.TODO(), env.GetCurrentUserHomeDir, filesys.LocalFS, doltdb.LocalDirDoltDB)
 
 	emitter := createMetricsEmitter(dEnv)
+	// create a new grpc emitter
 	defer func() {
 		ces := events.GlobalCollector.Close()
-		// events.WriterEmitter{cli.CliOut}.LogEvents(Version, ces)
+		events.WriterEmitter{cli.CliOut}.LogEvents(Version, ces)
+		// call log events on the emitter and pass in the client events
 		_ = emitter.LogEvents(Version, ces)
 	}()
 
